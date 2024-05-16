@@ -1,0 +1,36 @@
+server:
+  port: 8002
+
+spring:
+  # redis配置, 使用lettuce客户端
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+  # spring gateway配置，过滤器统一在GatewayConfig中配置
+  cloud:
+    gateway:
+      routes:
+        - id: test
+          uri: http://localhost:8089
+          predicates:
+              - Path=/api/test/**
+        - id: user
+          uri: http://localhost:8090
+          predicates:
+              - Path=/api/user/**
+
+jwt:
+  issuer: auth0
+  secret: token-secret-001
+  expire-second: 36000
+  max-idle-second: 7200
+
