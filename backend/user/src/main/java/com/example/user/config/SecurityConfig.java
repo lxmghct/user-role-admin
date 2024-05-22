@@ -10,7 +10,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        SecurityUtils.setDefaultHttpSecurity(http);
+        SecurityUtils.setDefaultHttpSecurity(http, "/user/login",
+                "/home/**",
+                "/user/register",
+                "/user/checkUserName");
     }
 
 }
