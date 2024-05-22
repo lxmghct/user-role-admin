@@ -48,7 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public User addOneUser(UserDTO userInfo) {
+    public User addOneUser(UserDTO userInfo) throws CustomRuntimeException {
         if (UserUtils.isUserNameContainsIllegalCharacter(userInfo.getUserName())) {
             throw new CustomRuntimeException(StatusEnum.USER_NAME_CONTAINS_ILLEGAL_CHARACTER);
         }
@@ -117,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean existsByUserName(String userName, Boolean throwExceptionWhenExists) {
+    public boolean existsByUserName(String userName, Boolean throwExceptionWhenExists) throws CustomRuntimeException {
         if (DataUtils.checkEmptyString(userName)) {
             throw new CustomRuntimeException(StatusEnum.USER_NAME_NOT_EMPTY);
         }

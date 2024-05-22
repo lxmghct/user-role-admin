@@ -22,7 +22,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     @Override
-    public boolean existsByName(String roleName, boolean throwExceptionWhenExists) {
+    public boolean existsByName(String roleName, boolean throwExceptionWhenExists) throws CustomRuntimeException {
         if (DataUtils.checkEmptyString(roleName)) {
             throw new CustomRuntimeException(StatusEnum.ROLE_NAME_NOT_EMPTY);
         }
