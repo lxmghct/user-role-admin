@@ -45,7 +45,7 @@ public class AuthController {
      */
     @ApiOperation(value = "使用用户名密码登录", notes = "使用用户名密码登录")
     @ApiImplicitParam(paramType = "header", name = "X-Real-IP", value = "ip", required = true, dataType = "string")
-    @PostMapping(value = "/login/username")
+    @PostMapping(value = "/login")
     public ResponseVO<Map<String, Object>> login(@RequestParam @ApiParam(value = "用户名", required = true) String userName,
                                                  @RequestParam @ApiParam(value = "密码", required = true) String password,
                                                  @RequestParam @ApiParam(value = "登录系统, " + SystemEnum.SYSTEM_DESC, required = true) Integer system) {

@@ -1,6 +1,7 @@
 package com.example.user.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.common.constant.PermissionCode;
 import com.example.common.enums.CommonStatusEnum;
 import com.example.common.exceptions.CustomRuntimeException;
 import com.example.user.constant.ApiConstants;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -152,6 +154,7 @@ public class UserController {
      */
     @PostMapping
     @ApiOperation(value = "添加用户")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<User> addOneUser(@RequestBody UserDTO userInfo) {
         User user;
         try {
@@ -174,6 +177,7 @@ public class UserController {
      * @param pageSize      每页数量
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Page<User>> getUserList(
             @RequestParam(defaultValue = "") @ApiParam(value = "用户名") String userName,
             @RequestParam(required = false) @ApiParam(value = "最小创建时间") String minCreateTime,
@@ -204,6 +208,7 @@ public class UserController {
      */
     @PutMapping("/{id}")
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserInfo(@PathVariable Integer id,
                                              @RequestBody UserDTO userInfo) {
         User user = userService.getById(id);
@@ -227,6 +232,7 @@ public class UserController {
      * @param avatar 头像
      */
     @PutMapping("/{id}/avatar")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserAvatar(@PathVariable int id,
                                                @RequestPart MultipartFile avatar) {
         User user = userService.getById(id);
@@ -246,6 +252,7 @@ public class UserController {
      * @param id 用户id
      */
     @GetMapping("/{id}/avatar")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<?> getUserAvatar(@PathVariable int id, HttpServletResponse response) {
         User user = userService.getById(id);
         String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatar();
@@ -264,6 +271,7 @@ public class UserController {
      */
     @DeleteMapping
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> deleteUsers(@RequestParam @ApiParam(value = "用户id列表") List<Integer> ids) {
         if (ids == null || ids.isEmpty()) {
             return ResponseVO.error(CommonStatusEnum.BAD_REQUEST);
@@ -282,6 +290,7 @@ public class UserController {
      */
     @PostMapping("/batch")
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Map<String, Object>> batchCreateUser(@RequestBody List<UserDTO> userList) {
         Map<String, Object> resultMap = userService.batchCreateUser(userList);
         if (resultMap == null) {
@@ -301,6 +310,7 @@ public class UserController {
      * @param status 用户状态
      */
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserStatus(@PathVariable Integer id,
                                                @RequestParam @ApiParam(value = User.Status.DESC, required = true) Integer status) {
         User user = userService.getById(id);

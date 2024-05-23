@@ -1,6 +1,7 @@
 package com.example.user.config;
 
 import com.example.common.utils.SecurityUtils;
+import com.example.user.constant.ApiConstants;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -10,10 +11,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        SecurityUtils.setDefaultHttpSecurity(http, "/user/login",
-                "/home/**",
-                "/user/register",
-                "/user/checkUserName");
+        SecurityUtils.setDefaultHttpSecurity(http, ApiConstants.API_PREFIX + "/auth/login",
+                ApiConstants.API_PREFIX + "/user-name/exists",
+                ApiConstants.API_PREFIX + "/register");
     }
 
 }
