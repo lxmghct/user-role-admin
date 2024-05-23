@@ -2,6 +2,8 @@ server:
   port: 8002
 
 spring:
+  application:
+    name: gateway
   # redis配置, 使用lettuce客户端
   redis:
     host: localhost
@@ -20,13 +22,21 @@ spring:
     gateway:
       routes:
         - id: test
-          uri: http://localhost:8089
+          uri: lb://test
           predicates:
               - Path=/api/test/**
         - id: user
-          uri: http://localhost:8090
+          uri: lb://user
           predicates:
               - Path=/api/user/**
+
+eureka:
+  client:
+
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
 
 jwt:
   issuer: auth0

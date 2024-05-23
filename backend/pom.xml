@@ -17,6 +17,7 @@
     </parent>
 
     <modules>
+        <module>eureka-server</module>
         <module>common</module>
         <module>gateway</module>
         <module>user</module>
@@ -32,6 +33,8 @@
         <knife4j-spring-ui.version>2.0.3</knife4j-spring-ui.version>
         <mysql.version>8.0.17</mysql.version>
         <commons-io.version>2.16.0</commons-io.version>
+        <eureka-server.version>2.1.5.RELEASE</eureka-server.version>
+        <eurake-client.version>2.1.5.RELEASE</eurake-client.version>
     </properties>
 
     <dependencyManagement>
@@ -105,6 +108,20 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <!-- Spring Cloud Starter Eureka Server -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>${eureka-server.version}</version>
+            </dependency>
+
+            <!-- Spring Cloud Starter Eureka Discovery -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                <version>${eurake-client.version}</version>
             </dependency>
 
         </dependencies>

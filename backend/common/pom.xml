@@ -83,5 +83,11 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Cloud Starter Eureka Discovery -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
