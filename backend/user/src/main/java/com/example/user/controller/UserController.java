@@ -261,14 +261,13 @@ public class UserController {
     @ApiOperation(value = "获取用户头像")
     @GetMapping("/{id}/avatar")
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<?> getUserAvatar(@PathVariable long id, HttpServletResponse response) {
+    public void getUserAvatar(@PathVariable long id, HttpServletResponse response) {
         User user = userService.getById(id);
         String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatarPath();
         try {
             FileUtils.writeImageToResponse(avatarPath, response);
-            return null;
         } catch (IOException ignored) {
-            return ResponseVO.error(CommonStatusEnum.NOT_FOUND);
+            response.setStatus(CommonStatusEnum.NO_CONTENT.getCode());
         }
     }
 
