@@ -1,0 +1,6 @@
+build/*.js
+src/assets
+public
+dist
+src/components/PasswordStrengthBar/utils/MostPopularPasswords.js
+src/components/PasswordStrengthBar/utils/PasswordQualityCalculator.js
