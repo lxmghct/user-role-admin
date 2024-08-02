@@ -51,8 +51,6 @@ public class User implements Serializable {
     private Date createTime;
     // 更新时间
     private Date updateTime;
-    // 过期时间
-    private Date expireTime;
 
     // 非数据库字段
     @TableField(exist = false)
