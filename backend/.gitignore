@@ -34,3 +34,6 @@ build/
 
 ### logs ###
 logs/
+
+### file ###
+/files/

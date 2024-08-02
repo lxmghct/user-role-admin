@@ -3,13 +3,14 @@ package com.example.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.common.exceptions.CustomRuntimeException;
-import com.example.user.entity.User;
 import com.example.user.dto.UserDTO;
+import com.example.user.entity.User;
 import com.example.user.enums.StatusEnum;
 import com.example.user.mapper.UserMapper;
 import com.example.user.service.UserRoleService;
 import com.example.user.service.UserService;
 import com.example.user.utils.DataUtils;
+import com.example.user.utils.IdGenerator;
 import com.example.user.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public List<Map<String, Object>> getUserRoleAndPermissionsByUserId(List<Integer> userIds) {
+    public List<Map<String, Object>> getUserRoleAndPermissionsByUserId(List<Long> userIds) {
         if (userIds == null || userIds.size() == 0) {
             return new ArrayList<>();
         }
@@ -42,6 +43,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Page<User> getUserList(String userName, String minCreateTime, String maxCreateTime, String orderBy, String orderMethod, Integer page, Integer pageSize) {
         List<User> userList = userMapper.getUserList(userName, minCreateTime, maxCreateTime, orderBy, orderMethod, (page - 1) * pageSize, pageSize);
+        List<Map<String, Object>> list = userMapper.getUserRoleAndPermissionsByUserId(userList.stream().map(User::getId).collect(Collectors.toList()));
+        Map<Long, Map<String, Object>> map = list.stream().collect(Collectors.toMap(m -> (Long) m.get("userId"), m -> m));
+        for (User user : userList) {
+            UserUtils.setUserRoleAndPermissionInfo(user, Collections.singletonList(map.get(user.getId())));
+        }
         int total = userMapper.countUserList(userName, minCreateTime, maxCreateTime);
         return DataUtils.getPage(userList, total, page, pageSize);
     }
@@ -56,6 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         existsByUserName(userInfo.getUserName(), true);
         User user = userInfo.toEntity(User.class);
         Date date = new Date();
+        user.setId(IdGenerator.nextId());
         user.setStatus(User.Status.ENABLE).setCreateTime(date).setUpdateTime(date);
         userMapper.insert(user);
         userRoleService.addUserRole(user.getId(), userInfo.getRoleIds(), false);
@@ -92,6 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             addedUserNameSet.add(userDTO.getUserName());
             User user = userDTO.toEntity(User.class);
+            user.setId(IdGenerator.nextId());
             user.setStatus(User.Status.ENABLE).setCreateTime(date).setUpdateTime(date);
             addUserList.add(user);
             userRoleList.add(new HashMap<String, Object>() {{

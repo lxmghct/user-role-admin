@@ -3,20 +3,21 @@ package com.example.user.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.common.constant.PermissionCode;
 import com.example.common.enums.CommonStatusEnum;
-import com.example.common.exceptions.CustomRuntimeException;
-import com.example.user.constant.ApiConstants;
-import com.example.user.dto.UserSelfDTO;
-import com.example.user.entity.User;
 import com.example.common.enums.StorageEnum;
+import com.example.common.exceptions.CustomRuntimeException;
 import com.example.common.utils.FileUtils;
 import com.example.common.utils.ServletUtils;
 import com.example.common.vo.ResponseVO;
+import com.example.user.constant.ApiConstants;
 import com.example.user.dto.UserDTO;
+import com.example.user.dto.UserSelfDTO;
+import com.example.user.entity.User;
 import com.example.user.enums.StatusEnum;
 import com.example.user.service.UserRoleService;
 import com.example.user.service.UserService;
 import com.example.user.utils.DataUtils;
 import com.example.user.utils.UserUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @RestController
+@Api(tags = "user-api")
 @RequestMapping(ApiConstants.API_PREFIX + "/users")
 public class UserController {
 
@@ -51,7 +56,7 @@ public class UserController {
     @ApiOperation(value = "修改密码输入原密码时，实时检验原密码是否正确")
     @PostMapping("/check-password")
     public ResponseVO<Boolean> checkPassword(@RequestParam @ApiParam(value = "密码", required = true) String password) {
-        Integer userId = ServletUtils.getUserId();
+        Long userId = ServletUtils.getUserId();
         User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", password).ne("status", User.Status.DELETED));
         return ResponseVO.success(user != null);
     }
@@ -66,8 +71,8 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseVO<String> updatePassword(@RequestParam @ApiParam(value = "旧密码", required = true) String oldPassword,
                                              @RequestParam @ApiParam(value = "新密码", required = true) String newPassword) {
-        String userName = ServletUtils.getUsername();
-        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName).eq("password", oldPassword).ne("status", User.Status.DELETED));
+        Long userId = ServletUtils.getUserId();
+        User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", oldPassword).ne("status", User.Status.DELETED));
         if (user == null) {
             return ResponseVO.error(StatusEnum.PASSWORD_ERROR);
         }
@@ -86,10 +91,10 @@ public class UserController {
      *
      * @param avatar 头像文件
      */
-    @ApiOperation(value = "更新用户头像", notes = "根据用户id和头像信息进行更改用户头像操作")
+    @ApiOperation(value = "更新用户自己头像", notes = "根据用户id和头像信息进行更改用户头像操作")
     @PutMapping("/me/avatar")
     public ResponseVO<String> updateUserAvatar(@RequestPart MultipartFile avatar) {
-        Integer userId = ServletUtils.getUserId();
+        Long userId = ServletUtils.getUserId();
         User user = userService.getById(userId);
         if (UserUtils.updateUserAvatar(user, avatar)) {
             return ResponseVO.success();
@@ -103,10 +108,10 @@ public class UserController {
      *
      * @param userInfo 用户信息
      */
-    @ApiOperation(value = "修改用户信息", notes = "根据用户id和用户信息进行更改用户信息操作")
+    @ApiOperation(value = "修改用户自身信息", notes = "根据用户id和用户信息进行更改用户信息操作")
     @PutMapping("/me")
     public ResponseVO<String> updateAdminInfo(@RequestBody UserSelfDTO userInfo) {
-        Integer userId = ServletUtils.getUserId();
+        Long userId = ServletUtils.getUserId();
         User user = userService.getById(userId);
         if (userInfo.isNotModified(user)) {
             return ResponseVO.error(StatusEnum.USER_INFO_NOT_CHANGED);
@@ -122,12 +127,12 @@ public class UserController {
     /**
      * 获取用户头像
      */
-    @ApiOperation(value = "获取用户头像")
+    @ApiOperation(value = "获取用户自己的头像")
     @GetMapping("/me/avatar")
     public void getAvatar(HttpServletResponse response) {
-        Integer userId = ServletUtils.getUserId();
+        Long userId = ServletUtils.getUserId();
         User user = userService.getById(userId);
-        String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatar();
+        String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatarPath();
         try {
             FileUtils.writeImageToResponse(avatarPath, response);
         } catch (IOException ignored) {
@@ -138,7 +143,7 @@ public class UserController {
     /**
      * 获取用户信息
      */
-    @ApiOperation(value = "获取用户信息")
+    @ApiOperation(value = "获取用户自身信息")
     @GetMapping("/me")
     public ResponseVO<User> getUserInfo() {
         User user = userService.getById(ServletUtils.getUserId());
@@ -176,6 +181,7 @@ public class UserController {
      * @param pageNum       页码
      * @param pageSize      每页数量
      */
+    @ApiOperation(value = "获取用户列表")
     @GetMapping
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Page<User>> getUserList(
@@ -206,12 +212,12 @@ public class UserController {
      *
      * @param userInfo 用户信息
      */
-    @PutMapping("/{id}")
+    @ApiOperation(value = "更新用户信息", notes = "根据用户id和用户信息进行更改用户信息操作")
+    @PutMapping
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<String> updateUserInfo(@PathVariable Integer id,
-                                             @RequestBody UserDTO userInfo) {
-        User user = userService.getById(id);
+    public ResponseVO<String> updateUserInfo(@RequestBody UserDTO userInfo) {
+        User user = userService.getById(userInfo.getId());
         if (user == null) {
             return ResponseVO.error(StatusEnum.USER_NOT_FOUND);
         }
@@ -219,8 +225,8 @@ public class UserController {
         user.setUpdateTime(new Date());
         userService.updateById(user);
         if (userInfo.getRoleIds() != null) {
-            userRoleService.addUserRole(id, userInfo.getRoleIds(), true);
-            ServletUtils.updatePermission(Collections.singletonList(id));
+            userRoleService.addUserRole(userInfo.getId(), userInfo.getRoleIds(), true);
+            ServletUtils.updatePermission(Collections.singletonList(userInfo.getId()));
         }
         return ResponseVO.success("更新成功");
     }
@@ -231,9 +237,10 @@ public class UserController {
      * @param id     用户id
      * @param avatar 头像
      */
+    @ApiOperation(value = "更新用户头像")
     @PutMapping("/{id}/avatar")
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<String> updateUserAvatar(@PathVariable int id,
+    public ResponseVO<String> updateUserAvatar(@PathVariable long id,
                                                @RequestPart MultipartFile avatar) {
         User user = userService.getById(id);
         if (user == null) {
@@ -251,11 +258,12 @@ public class UserController {
      *
      * @param id 用户id
      */
+    @ApiOperation(value = "获取用户头像")
     @GetMapping("/{id}/avatar")
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<?> getUserAvatar(@PathVariable int id, HttpServletResponse response) {
+    public ResponseVO<?> getUserAvatar(@PathVariable long id, HttpServletResponse response) {
         User user = userService.getById(id);
-        String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatar();
+        String avatarPath = StorageEnum.USER_AVATAR_PATH.getDesc() + user.getAvatarPath();
         try {
             FileUtils.writeImageToResponse(avatarPath, response);
             return null;
@@ -269,10 +277,11 @@ public class UserController {
      *
      * @param ids 用户id列表
      */
+    @ApiOperation(value = "删除用户")
     @DeleteMapping
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<String> deleteUsers(@RequestParam @ApiParam(value = "用户id列表") List<Integer> ids) {
+    public ResponseVO<String> deleteUsers(@RequestParam @ApiParam(value = "用户id列表") List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return ResponseVO.error(CommonStatusEnum.BAD_REQUEST);
         }
@@ -288,6 +297,7 @@ public class UserController {
      *
      * @param userList 用户列表
      */
+    @ApiOperation(value = "批量创建用户")
     @PostMapping("/batch")
     @Transactional(rollbackFor = Exception.class)
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
@@ -309,9 +319,10 @@ public class UserController {
      * @param id     用户id
      * @param status 用户状态
      */
+    @ApiOperation(value = "修改用户状态")
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
-    public ResponseVO<String> updateUserStatus(@PathVariable Integer id,
+    public ResponseVO<String> updateUserStatus(@PathVariable Long id,
                                                @RequestParam @ApiParam(value = User.Status.DESC, required = true) Integer status) {
         User user = userService.getById(id);
         if (user == null) {

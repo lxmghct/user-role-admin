@@ -6,7 +6,7 @@ import com.google.gson.JsonSyntaxException;
 
 public class TokenData {
 
-    public Integer userId;
+    public Long userId;
 
     public String username;
 

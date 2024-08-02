@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -22,15 +24,17 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @TableId(value = "id", type = IdType.INPUT)
+    private Long id;
     // 用户名
     private String userName;
-    // 真实姓名
-    private String trueName;
     // 密码
     @JsonIgnore
     private String password;
+    // 头像路径
+    private String avatarPath;
+    // 电话
+    private String phone;
     // 邮箱
     private String email;
     // 性别, 0: 男, 1: 女
@@ -39,16 +43,16 @@ public class User implements Serializable {
     private String address;
     // 个人简介
     private String introduction;
-    // 头像
-    private String avatar;
-    // 电话
-    private String phone;
-    // 状态, 0: 禁用, 1: 启用
+    // 真实姓名
+    private String trueName;
+    // 状态, 0: 禁用, 1: 启用, 2: 删除
     private Integer status;
     // 注册时间
     private Date createTime;
     // 更新时间
     private Date updateTime;
+    // 过期时间
+    private Date expireTime;
 
     // 非数据库字段
     @TableField(exist = false)
@@ -74,8 +78,12 @@ public class User implements Serializable {
         public static final Integer ENABLE = Integer.parseInt(ENABLED_STR);
         public static final Integer DELETED = Integer.parseInt(DELETED_STR);
 
-
         public static final String DESC = DISABLED_STR + ": 禁用, " + ENABLED_STR + ": 启用, " + DELETED_STR + ": 删除";
+    }
+
+    public static class Gender {
+        public static final Integer MALE = 0;
+        public static final Integer FEMALE = 1;
     }
 
     // 排序字段

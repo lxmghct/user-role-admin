@@ -1,6 +1,8 @@
 package com.example.user.dto;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +25,9 @@ public class BaseDTO<T> {
             for (Field field : fields) {
                 // 获取属性名
                 String fieldName = field.getName();
+                if (getExcludeFields().contains(fieldName)) {
+                    continue;
+                }
                 // 获取属性值
                 field.setAccessible(true);
                 Object fieldValue = field.get(this);
@@ -50,14 +55,17 @@ public class BaseDTO<T> {
             for (Field field : fields) {
                 // 获取属性名
                 String fieldName = field.getName();
-                // 获取属性值
-                field.setAccessible(true);
-                Object fieldValue = field.get(this);
+                if (getExcludeFields().contains(fieldName)) {
+                    continue;
+                }
                 // 获取数据库模型的属性
                 Field tField = t.getClass().getDeclaredField(fieldName);
                 tField.setAccessible(true);
                 // 获取数据库模型的属性值
                 Object tFieldValue = tField.get(t);
+                // 获取属性值
+                field.setAccessible(true);
+                Object fieldValue = field.get(this);
                 // 判断是否有修改
                 if (!Objects.equals(fieldValue, tFieldValue)) {
                     return false;
@@ -83,6 +91,10 @@ public class BaseDTO<T> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    protected List<String> getExcludeFields() {
+        return new ArrayList<>();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.gateway.filter;
 
 import com.example.gateway.config.DevConfig;
+import com.example.gateway.constants.HeaderConstants;
 import com.example.gateway.pojo.TokenData;
 import com.example.gateway.utils.ResponseUtils;
 import com.example.gateway.utils.TokenUtils;
@@ -46,7 +47,7 @@ public class PreGatewayFilterFactory extends AbstractGatewayFilterFactory<PreGat
             builder.uri(URI.create(url + (url.contains("?") ? "&" : "?") +
                     "random-id=" + UUID.randomUUID().toString().substring(0, 8)));
             // 获取Authorization
-            String token = request.getHeaders().getFirst("Authorization");
+            String token = request.getHeaders().getFirst(HeaderConstants.AUTHORIZATION);
             if (DevConfig.ENABLE_REDIS) {
                 // 检查token是否有效，如果在黑名单中，就直接返回
                 if (token != null && !token.isEmpty()) {
@@ -83,15 +84,15 @@ public class PreGatewayFilterFactory extends AbstractGatewayFilterFactory<PreGat
                     // 可以使用redis防止并发请求时重复签发token，但也需要考虑redis并发访问的问题
                     // 也可以不使用redis，直接生成新token
                     String newToken = TokenUtils.sign(user);
-                    exchange.getAttributes().put("refresh-token", newToken);
+                    exchange.getAttributes().put(HeaderConstants.REFRESH_TOKEN, newToken);
                 }
                 // 将需要用到的信息放到exchange和header中
                 exchange.getAttributes().put("token-expire-at", expiresAt);
                 tokenData.remove("expiresAt");
-                builder.headers(httpHeaders -> httpHeaders.add("login-user", user.toJSONString()));
+                builder.headers(httpHeaders -> httpHeaders.add(HeaderConstants.LOGIN_USER, user.toJSONString()));
             } else {
                 // 防止伪造的login-user信息传递到下游服务
-                builder.headers(httpHeaders -> httpHeaders.remove("login-user"));
+                builder.headers(httpHeaders -> httpHeaders.remove(HeaderConstants.LOGIN_USER));
             }
             return chain.filter(exchange.mutate().request(builder.build()).build());
         };

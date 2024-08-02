@@ -26,7 +26,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     }
 
     @Override
-    public void addUserRole(Integer userId, List<Integer> roleIdList, boolean deleteOldRole) {
+    public void addUserRole(Long userId, List<Integer> roleIdList, boolean deleteOldRole) {
         if (deleteOldRole) {
             removeByMap(new HashMap<String, Object>() {{
                 put("user_id", userId);
@@ -60,7 +60,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
         List<UserRole> userRoleToSaveList = new ArrayList<>();
         Date date = new Date();
         for (Map<String, Object> userRole : userRoleList) {
-            Integer userId = (Integer) userRole.get("userId");
+            Long userId = (Long) userRole.get("userId");
             if (userId == null) {
                 continue;
             }

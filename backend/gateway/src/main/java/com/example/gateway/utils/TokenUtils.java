@@ -44,7 +44,7 @@ public class TokenUtils {
      * @param permission 用户权限
      * @return token
      */
-    public static String sign(Integer userId, String username, String role, String permission) {
+    public static String sign(Long userId, String username, String role, String permission) {
         Date expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
         return JWT.create()
                 .withIssuer(ISSUER)
@@ -99,7 +99,7 @@ public class TokenUtils {
             DecodedJWT jwt = JWT.decode(token);
             Map<String, Object> result = new HashMap<>();
             TokenData tokenData = new TokenData();
-            tokenData.userId = jwt.getClaim("userId").asInt();
+            tokenData.userId = jwt.getClaim("userId").asLong();
             tokenData.username = jwt.getClaim("username").asString();
             tokenData.role = jwt.getClaim("role").asString();
             tokenData.permission = jwt.getClaim("permission").asString();

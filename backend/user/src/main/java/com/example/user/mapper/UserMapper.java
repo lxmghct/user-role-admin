@@ -2,12 +2,10 @@ package com.example.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.user.entity.User;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +20,7 @@ public interface UserMapper extends BaseMapper<User> {
             "    GROUP_CONCAT(DISTINCT p.id) AS permissionIdList, " +
             "    GROUP_CONCAT(DISTINCT p.name) AS permissionNameList, " +
             "    GROUP_CONCAT(DISTINCT p.code) AS permissionCodeList," +
-            "    GROUP_CONCAT(DISTINCT p.system) AS systemList " +
+            "    GROUP_CONCAT(DISTINCT p.platform) AS platformList " +
             "FROM `user` u " +
             "LEFT JOIN `user_role` ur ON u.id = ur.user_id " +
             "LEFT JOIN `role` r ON ur.role_id = r.id " +
@@ -34,9 +32,10 @@ public interface UserMapper extends BaseMapper<User> {
             "</foreach> " +
             "GROUP BY u.id" +
             "</script>")
-    List<Map<String, Object>> getUserRoleAndPermissionsByUserId(@Param("userIds") List<Integer> userIds);
+    List<Map<String, Object>> getUserRoleAndPermissionsByUserId(@Param("userIds") List<Long> userIds);
 
-    String userSearchWhereSql = "<if test='userName != null'> AND u.`user_name` LIKE CONCAT('%', #{userName}, '%') </if>" +
+    String userSearchWhereSql = "u.`status` != " + User.Status.DELETED_STR +
+            "<if test='userName != null'> AND u.`user_name` LIKE CONCAT('%', #{userName}, '%') </if>" +
             "<if test='minCreateTime != null'>AND u.`create_time` &gt;= #{minCreateTime} </if>" +
             "<if test='maxCreateTime != null'>AND u.`create_time` &lt;= #{maxCreateTime} </if>";
 

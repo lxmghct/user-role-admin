@@ -14,8 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserSelfDTO extends BaseDTO<User> {
 
-    // 真实姓名
-    private String trueName;
     // 性别, 0: 男, 1: 女
     private Integer gender;
     // 地址

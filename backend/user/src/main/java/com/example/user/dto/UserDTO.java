@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,14 +20,13 @@ import java.util.List;
 public class UserDTO extends BaseDTO<User> {
 
     // 用户id
-    @ApiModelProperty(value = "用户id", hidden = true, notes = "用户id, 仅在返回用户信息时使用")
-    private Integer id;
+    @ApiModelProperty(value = "用户id", hidden = true, notes = "用户id, 创建时不需要传")
+    private Long id;
     // 用户名
     private String userName;
     // 真实姓名
     private String trueName;
     // 密码
-    @JsonIgnore
     private String password;
     // 邮箱
     private String email;
@@ -45,6 +45,13 @@ public class UserDTO extends BaseDTO<User> {
         this.userName = userName;
         this.password = password;
         this.roleIds = roleIds;
+    }
+
+    @Override
+    protected List<String> getExcludeFields() {
+        return new ArrayList<String>() {{
+            add("roleIds");
+        }};
     }
 
 }

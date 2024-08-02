@@ -15,8 +15,8 @@ public enum StatusEnum implements IStatusCode {
     USER_DISABLED(1007, "用户已被冻结"),
     USER_NAME_CONTAINS_ILLEGAL_CHARACTER(1008, "用户名仅支持字母、数字以及.-_"),
 
-    SYSTEM_NOT_EXISTS(1021, "登录系统不存在"),
-    PERMISSION_DENIED_FOR_SYSTEM(1022, "无权登录该系统"),
+    PLATFORM_NOT_EXISTS(1021, "登录系统不存在"),
+    PERMISSION_DENIED_FOR_PLATFORM(1022, "无权登录该系统"),
 
     PASSWORD_ERROR(1031, "密码错误"),
     PASSWORD_SAME(1032, "新密码不能与旧密码相同"),

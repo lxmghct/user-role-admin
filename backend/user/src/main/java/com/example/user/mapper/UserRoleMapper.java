@@ -17,7 +17,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
             "SELECT `user`.`id` AS `userId` FROM `user` " +
             "LEFT JOIN `user_role` ON `user`.`id` = `user_role`.`user_id` " +
             "WHERE `user`.`status` != " + User.Status.DELETED_STR +
-            "AND `user_role`.`role_id` IN " +
+            " AND `user_role`.`role_id` IN " +
             "<foreach collection='roleIds' item='roleId' open='(' separator=',' close=')'>" +
             "#{roleId}" +
             "</foreach>" +

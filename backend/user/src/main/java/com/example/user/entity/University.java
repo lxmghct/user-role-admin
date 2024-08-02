@@ -7,31 +7,27 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
- * 权限
+ * 学校表
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Permission implements Serializable {
+public class University implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    // 权限名称
+
+    // 学校代码
+    private Integer code;
+
+    // 学校名称
     private String name;
-    // 权限代码
-    private String code;
-    // 权限描述
-    private String description;
-    // 父级权限
-    private Integer parentId;
-    // 创建时间
-    private Date createTime;
-    // 系统
-    private String platform;
+
+    // 学校名缩写
+    private String abbreviation;
 
 }

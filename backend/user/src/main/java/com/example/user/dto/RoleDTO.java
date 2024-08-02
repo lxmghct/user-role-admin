@@ -16,7 +16,7 @@ import lombok.Setter;
 public class RoleDTO extends BaseDTO<Role> {
 
     // 角色id
-    @ApiModelProperty(value = "角色id", hidden = true, notes = "角色id, 仅在返回角色信息时使用")
+    @ApiModelProperty(value = "角色id", hidden = true, notes = "角色id, 创建时不需要传")
     private Integer id;
 
     // 角色名
@@ -24,8 +24,5 @@ public class RoleDTO extends BaseDTO<Role> {
 
     // 角色描述
     private String description;
-
-    // 权限等级
-    private Integer level;
 
 }

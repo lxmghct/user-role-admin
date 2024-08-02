@@ -3,18 +3,19 @@ package com.example.user.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.common.enums.CommonStatusEnum;
 import com.example.common.exceptions.CustomRuntimeException;
+import com.example.common.utils.ServletUtils;
+import com.example.common.vo.ResponseVO;
 import com.example.user.constant.ApiConstants;
 import com.example.user.dto.RoleDTO;
 import com.example.user.entity.Permission;
 import com.example.user.entity.Role;
 import com.example.user.entity.RolePermission;
-import com.example.common.utils.ServletUtils;
-import com.example.common.vo.ResponseVO;
 import com.example.user.enums.StatusEnum;
 import com.example.user.service.PermissionService;
 import com.example.user.service.RolePermissionService;
 import com.example.user.service.RoleService;
 import com.example.user.service.UserRoleService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
+@Api(tags = "role-api")
 @RequestMapping(ApiConstants.API_PREFIX + "/roles")
 public class RoleController {
 
@@ -85,22 +87,21 @@ public class RoleController {
     @GetMapping
     public ResponseVO<List<Role>> getRoleList(@RequestParam(defaultValue = "") @ApiParam("搜索内容") String searchContent) {
         List<Role> roleList = roleService.list(
-                new QueryWrapper<Role>().eq("status", Role.Status.ENABLE).like("name", searchContent)
-                .or().like("description", searchContent).orderByDesc("create_time"));
+                new QueryWrapper<Role>().eq("status", Role.Status.ENABLE).and(
+                        wrapper -> wrapper.like("name", searchContent).or().like("description", searchContent)
+                ).orderByDesc("create_time"));
         return ResponseVO.success(roleList);
     }
 
     /**
      * 修改角色信息
      *
-     * @param id       角色id
      * @param roleInfo 角色信息
      */
     @ApiOperation(value = "修改角色信息")
-    @PutMapping("/{id}")
-    public ResponseVO<String> updateRole(@PathVariable("id") Integer id,
-                                         @RequestBody RoleDTO roleInfo) {
-        Role role = roleService.getById(id);
+    @PutMapping
+    public ResponseVO<String> updateRole(@RequestBody RoleDTO roleInfo) {
+        Role role = roleService.getById(roleInfo.getId());
         if (role == null || !role.getStatus().equals(Role.Status.ENABLE)) {
             return ResponseVO.error(StatusEnum.ROLE_NOT_FOUND);
         }
@@ -112,6 +113,7 @@ public class RoleController {
         if (roleInfo.isNotModified(role)) {
             return ResponseVO.error(StatusEnum.ROLE_INFO_NOT_CHANGED);
         }
+        roleInfo.copyDataTo(role);
         role.setUpdateTime(new Date());
         roleService.updateById(role);
         return ResponseVO.success();
@@ -144,6 +146,7 @@ public class RoleController {
      *
      * @param id 角色id
      */
+    @ApiOperation(value = "获取角色权限列表")
     @GetMapping("/{id}/permissions")
     public ResponseVO<List<Permission>> getPermissionListOfRole(@PathVariable("id") Integer id) {
         Role role = roleService.getById(id);
@@ -161,6 +164,7 @@ public class RoleController {
      * @param permissionIds 权限id列表
      * @param deleteOld        是否删除原有权限
      */
+    @ApiOperation(value = "添加角色权限")
     @PostMapping("/{roleId}/permissions")
     @Transactional(rollbackFor = Exception.class)
     public ResponseVO<String> addRolePermissions(@PathVariable("roleId") @ApiParam(value = "角色id", required = true) Integer roleId,
@@ -196,7 +200,7 @@ public class RoleController {
         rolePermissionService.saveBatch(rolePermissionList);
         // 更新用户权限缓存
         List<Map<String, Object>> userIdList = userRoleService.getUserIdsByRoleIds(Collections.singletonList(roleId));
-        List<Integer> userIds = userIdList.stream().map(map -> (Integer) map.get("userId")).collect(Collectors.toList());
+        List<Long> userIds = userIdList.stream().map(map -> (Long) map.get("userId")).collect(Collectors.toList());
         ServletUtils.updatePermission(userIds);
         return ResponseVO.success();
     }
@@ -206,6 +210,7 @@ public class RoleController {
      *
      * @param rolePermissionIds 角色权限id列表
      */
+    @ApiOperation(value = "删除角色权限")
     @DeleteMapping("role-permissions")
     public ResponseVO<String> deleteRolePermissions(@RequestParam List<Integer> rolePermissionIds) {
         if (rolePermissionIds != null && !rolePermissionIds.isEmpty()) {

@@ -10,28 +10,31 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 权限
+ * 用户认证表
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Permission implements Serializable {
+public class UserIdentify implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    // 权限名称
-    private String name;
-    // 权限代码
-    private String code;
-    // 权限描述
-    private String description;
-    // 父级权限
-    private Integer parentId;
-    // 创建时间
-    private Date createTime;
-    // 系统
-    private String platform;
+
+    // 用户id
+    private Long userId;
+
+    // 学校代码
+    private Integer universityCode;
+
+    // 认证时间
+    private Date identifyTime;
+
+    // 过期时间
+    private Date expireTime;
+
+    // 学历
+    private Integer qualification;
 
 }

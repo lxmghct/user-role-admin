@@ -36,7 +36,6 @@ public class TokenUtils {
                     .withClaim("role", tokenData.role)
                     .withClaim("permission", tokenData.permission)
                     .withExpiresAt(expiresAt)
-                    // 使用HMAC256加密算法
                     .sign(Algorithm.HMAC256(TOKEN_SECRET));
 
         } catch (Exception e) {
@@ -73,7 +72,7 @@ public class TokenUtils {
         try {
             DecodedJWT jwt = JWT.decode(token);
             TokenData tokenData = new TokenData();
-            tokenData.userId = jwt.getClaim("userId").asInt();
+            tokenData.userId = jwt.getClaim("userId").asLong();
             tokenData.username = jwt.getClaim("username").asString();
             tokenData.role = jwt.getClaim("role").asString();
             tokenData.permission = jwt.getClaim("permission").asString();

@@ -1,6 +1,7 @@
 package com.example.gateway.filter;
 
 import com.example.gateway.config.DevConfig;
+import com.example.gateway.constants.HeaderConstants;
 import com.example.gateway.pojo.TokenData;
 import com.example.gateway.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,14 +39,14 @@ public class PostGatewayFilterFactory extends AbstractGatewayFilterFactory<PostG
             ServerHttpRequest request = exchange.getRequest();
             // 判断是否需要刷新token，refresh-token是在PreGatewayFilterFactory中添加的
             // 这里指token自然失效，但用户还在操作，所以只需要刷新token，不需要重新登录
-            if (exchange.getAttributes().containsKey("refresh-token")) {
-                response.getHeaders().set("Authorization", exchange.getAttribute("refresh-token"));
-                response.getHeaders().remove("refresh-token");
+            if (exchange.getAttributes().containsKey(HeaderConstants.REFRESH_TOKEN)) {
+                response.getHeaders().set("Authorization", exchange.getAttribute(HeaderConstants.REFRESH_TOKEN));
+                response.getHeaders().remove(HeaderConstants.REFRESH_TOKEN);
             }
             // 判断是否需要让token失效，比如退出登录接口，如果需要则在response添加remove-token请求头，值为任意值
-            if (response.getHeaders().containsKey("remove-token")) {
+            if (response.getHeaders().containsKey(HeaderConstants.REMOVE_TOKEN)) {
                 if (DevConfig.ENABLE_REDIS) {
-                    String token = request.getHeaders().getFirst("Authorization");
+                    String token = request.getHeaders().getFirst(HeaderConstants.AUTHORIZATION);
                     if (token != null && !token.isEmpty()) {
                         Date expiresAt = exchange.getAttribute("token-expire-at");
                         Date now = new Date();
@@ -56,13 +57,13 @@ public class PostGatewayFilterFactory extends AbstractGatewayFilterFactory<PostG
                         }
                     }
                 }
-                response.getHeaders().set("remove-token", "1");
-                response.getHeaders().remove("Authorization");
+                response.getHeaders().set(HeaderConstants.REMOVE_TOKEN, "1");
+                response.getHeaders().remove(HeaderConstants.AUTHORIZATION);
             }
             // 判断是否需要刷新权限，如果需要则在后端接口中给response添加update-permission请求头，值为任意值
-            if (response.getHeaders().containsKey("update-permission")) {
+            if (response.getHeaders().containsKey(HeaderConstants.UPDATE_PERMISSION)) {
                 if (DevConfig.ENABLE_REDIS) {
-                    String userIdStr = response.getHeaders().getFirst("update-permission");
+                    String userIdStr = response.getHeaders().getFirst(HeaderConstants.UPDATE_PERMISSION);
                     if (userIdStr != null) {
                         Date now = new Date();
                         String[] userIds = userIdStr.split(",");
@@ -78,23 +79,23 @@ public class PostGatewayFilterFactory extends AbstractGatewayFilterFactory<PostG
                         }
                     }
                 }
-                response.getHeaders().remove("update-permission");
+                response.getHeaders().remove(HeaderConstants.UPDATE_PERMISSION);
             }
             // 判断是否需要生成token，需要生成时就在某些接口中给response的请求头添加token-data，格式为:
             // {"userId":1,"username":"admin","roles":"admin,user","permissions":"test1,test2"}
-            if (response.getHeaders().containsKey("token-data")) {
-                TokenData newTokenData = TokenData.fromJSONString(response.getHeaders().getFirst("token-data"));
+            if (response.getHeaders().containsKey(HeaderConstants.TOKEN_DATA)) {
+                TokenData newTokenData = TokenData.fromJSONString(response.getHeaders().getFirst(HeaderConstants.TOKEN_DATA));
                 if (newTokenData != null) {
                     // 先判断原来是否有登录信息，有则更新，没有则添加
-                    TokenData tokenDataObj = TokenData.fromJSONString(request.getHeaders().getFirst("login-user"));
+                    TokenData tokenDataObj = TokenData.fromJSONString(request.getHeaders().getFirst(HeaderConstants.LOGIN_USER));
                     if (tokenDataObj != null) {
                         tokenDataObj.copyNonNullValueFrom(newTokenData);
-                        response.getHeaders().set("Authorization", TokenUtils.sign(tokenDataObj));
+                        response.getHeaders().set(HeaderConstants.AUTHORIZATION, TokenUtils.sign(tokenDataObj));
                     } else {
-                        response.getHeaders().set("Authorization", TokenUtils.sign(newTokenData));
+                        response.getHeaders().set(HeaderConstants.AUTHORIZATION, TokenUtils.sign(newTokenData));
                     }
                 }
-                response.getHeaders().remove("token-data");
+                response.getHeaders().remove(HeaderConstants.TOKEN_DATA);
             }
         }));
     }

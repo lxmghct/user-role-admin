@@ -67,7 +67,7 @@ public class ServletUtils {
      *
      * @return 用户id
      */
-    public static Integer getUserId() {
+    public static Long getUserId() {
         TokenData userData = getUserInfo();
         return userData == null ? null : userData.userId;
     }
@@ -90,7 +90,7 @@ public class ServletUtils {
      * @param roles       角色
      * @param permissions 权限
      */
-    public static void setTokenData(Integer userId, String username, String roles, String permissions) {
+    public static void setTokenData(Long userId, String username, String roles, String permissions) {
         if (DevConfig.ENABLE_GATEWAY) {
             TokenData tokenData = new TokenData(userId, username, roles, permissions);
             getResponse().setHeader(HeaderEnum.TOKEN_DATA.getValue(), tokenData.toJSONString());
@@ -112,7 +112,7 @@ public class ServletUtils {
      *
      * @param userIds 用户id列表
      */
-    public static void updatePermission(List<Integer> userIds) {
+    public static void updatePermission(List<Long> userIds) {
         if (userIds != null && userIds.size() > 0) {
             StringBuilder s = new StringBuilder(userIds.get(0) + "");
             for (int i = 1; i < userIds.size(); i++) {
