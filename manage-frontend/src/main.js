@@ -17,7 +17,7 @@ import './icons' // icon
 import './permission' // permission control
 
 import axios from './utils/request'
-import vPermission from '@/directive/permission'
+import permission from '@/directive/permission'
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
@@ -26,7 +26,7 @@ Vue.use(Element, {
 Vue.config.productionTip = false
 
 Vue.prototype.$http = axios
-Vue.use(vPermission)
+Vue.directive('permission', permission)
 
 new Vue({
   el: '#app',
