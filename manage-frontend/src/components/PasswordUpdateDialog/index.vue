@@ -31,8 +31,8 @@
 </template>
 
 <script>
-import md5 from 'js-md5'
 import PasswordStrengthBar from '@/components/PasswordStrengthBar'
+import { changePassword } from '@/api/user'
 
 export default {
   name: 'UserIndex',
@@ -90,10 +90,7 @@ export default {
     updatePassword() {
       this.$refs['passwordUpdateForm'].validate((valid) => {
         if (valid) {
-          const params = new URLSearchParams()
-          params.append('oldPassword', md5(this.passwordUpdateForm.oldPassword))
-          params.append('newPassword', md5(this.passwordUpdateForm.newPassword))
-          this.$http.put('user-api/users/me/password', params).then(() => {
+          changePassword(this.passwordUpdateForm.oldPassword, this.passwordUpdateForm.newPassword).then(() => {
             this.$message.success('密码修改成功')
             this.cancelUpdatePassword()
           })

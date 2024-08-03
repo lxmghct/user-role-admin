@@ -77,6 +77,12 @@ export default {
   },
   methods: {
 
+    /**
+     * 根据列表构建树
+     * @param {Array} list 列表
+     * @param {String} idField id字段名
+     * @param {String} pidField 父id字段名
+     */
     buildTreeByList(list, idField = 'id', pidField = 'parentId') {
       const listData = Array.from(list)
       const tree = []
@@ -118,6 +124,9 @@ export default {
       return tree
     },
 
+    /**
+     * 获取所有权限
+     */
     getAllPermission() {
       RoleApi.getAllPermissions().then(res => {
         const data = res.data.data
@@ -139,6 +148,11 @@ export default {
       })
     },
 
+    /**
+     * 遍历树
+     * @param {Array} tree 树
+     * @param {Function} callback 回调
+     */
     traverseTree(tree, callback) {
       for (let i = 0; i < tree.length; i++) {
         const item = tree[i]
@@ -149,6 +163,10 @@ export default {
       }
     },
 
+    /**
+     * 修改权限树的勾选状态
+     * @param {Array} permissionList 权限列表
+     */
     changePermissionCheckStatus(permissionList) {
       this.traverseTree(this.permissionTree, item => {
         if (permissionList.includes(item.id)) {
@@ -162,6 +180,10 @@ export default {
       })
     },
 
+    /**
+     * 修改节点的勾选状态
+     * @param {Object} node 节点
+     */
     modifyNodeCheckStatus(node) {
       const children = node.children
       if (children) {
@@ -172,6 +194,11 @@ export default {
         node.indeterminate = children.some(item => item.indeterminate) || children.some(item => item.checked) && children.some(item => !item.checked)
       }
     },
+
+    /**
+     * 获取角色的权限
+     * @param {Number} roleId 角色id
+     */
     getPermissionOfRole(roleId) {
       RoleApi.getPermissionOfRole(roleId).then(res => {
         const permissionList = res.data.data
@@ -179,9 +206,17 @@ export default {
         this.changePermissionCheckStatus(this.permissionIdList)
       })
     },
+
+    /**
+     * 重置权限
+     */
     resetPermission() {
       this.changePermissionCheckStatus(this.permissionIdList)
     },
+
+    /**
+     * 获取角色列表
+     */
     getRoles() {
       this.roleForm.loading = true
       RoleApi.getRoles(this.roleForm.searchName).then((res) => {
@@ -200,6 +235,11 @@ export default {
       })
     },
 
+    /**
+     * 递归勾选/取消勾选所有子节点
+     * @param {Object} node 节点
+     * @param {Boolean} checked 是否勾选
+     */
     checkAllChildren(node, checked) {
       if (node.children) {
         node.children.forEach(item => {
@@ -209,6 +249,10 @@ export default {
       }
     },
 
+    /**
+     * 处理勾选状态改变
+     * @param {Object} row 行数据
+     */
     handleCheckChange(row) {
       // 将所有与当前节点permissionCode相同的节点勾选/取消勾选
       if (row.code) {
@@ -224,11 +268,18 @@ export default {
       })
     },
 
+    /**
+     * 处理当前角色改变
+     */
     handleCurrentRoleChange() {
       this.roleForm.currentRole = this.roleForm.roleList.find(item => item.name === this.roleForm.currentRoleName)
       this.getPermissionOfRole(this.roleForm.currentRole.id)
     },
 
+    /**
+     * 获取权限列表
+     * @returns {Array} 权限列表
+     */
     getPermissionListOfTree() {
       const permissionList = []
       this.traverseTree(this.permissionTree, item => {
@@ -239,6 +290,9 @@ export default {
       return permissionList
     },
 
+    /**
+     * 保存权限
+     */
     savePermission() {
       if (!this.roleForm.currentRole || !this.roleForm.currentRole.id) {
         this.$message({
@@ -262,6 +316,7 @@ export default {
         }
       })
     }
+
   }
 }
 </script>

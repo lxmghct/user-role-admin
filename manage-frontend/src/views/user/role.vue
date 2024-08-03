@@ -111,6 +111,10 @@ export default {
         }
       }
     },
+
+    /**
+     * 获取角色列表
+     */
     getRoleList() {
       RoleApi.getRoles(this.tableData.searchContent).then(res => {
         this.tableData.allData = res.data.data
@@ -118,12 +122,21 @@ export default {
         this.startPagination()
       })
     },
+
+    /**
+     * 前端分页
+     */
     startPagination() {
       // 角色数量较少，所以采用前端分页
       const start = (this.tableData.currentPage - 1) * this.tableData.pageSize
       const end = this.tableData.currentPage * this.tableData.pageSize
       this.tableData.list = this.tableData.allData.slice(start, end)
     },
+
+    /**
+     * 排序
+     * @param {Object} { prop, order }
+     */
     handleSortChange({ prop, order }) {
       const timeComparator = (a, b) => {
         return new Date(a).getTime() - new Date(b).getTime()
@@ -147,18 +160,32 @@ export default {
       }
       this.startPagination()
     },
+
+    /**
+     * 新增角色
+     */
     handleCreateRole() {
       for (const key in this.roleEditForm) {
         this.roleEditForm[key] = ''
       }
       this.openRoleEditDialog()
     },
+
+    /**
+     * 编辑角色
+     * @param {Object} row
+     */
     handleEdit(row) {
       for (const key in this.roleEditForm) {
         this.roleEditForm[key] = row[key]
       }
       this.openRoleEditDialog()
     },
+
+    /**
+     * 删除角色
+     * @param {Number} id
+     */
     handleDelete(id) {
       this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -173,6 +200,10 @@ export default {
         this.$message.info('已取消删除')
       })
     },
+
+    /**
+     * 新增/编辑角色(后端请求)
+     */
     addOrUpdateRole() {
       this.$refs.roleEditForm.validate(valid => {
         if (valid) {
@@ -185,6 +216,10 @@ export default {
         }
       })
     },
+
+    /**
+     * 打开角色编辑窗口
+     */
     openRoleEditDialog() {
       this.roleEditDialogVisible = true
       this.$nextTick(() => {

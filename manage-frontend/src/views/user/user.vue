@@ -246,12 +246,20 @@ export default {
         callback()
       }
     },
+
+    /**
+     * 获取所有角色
+     */
     getAllRoles() {
       getRoles().then(res => {
         this.allRoles = res.data.data
         this.$refs.userImportDialog.setRoles(this.allRoles)
       })
     },
+
+    /**
+     * 获取用户列表
+     */
     getUserList() {
       UserApi.getUsers(this.tableData).then(res => {
         this.tableData.list = res.data.data.content
@@ -263,6 +271,12 @@ export default {
         })
       })
     },
+
+    /**
+     * 获取用户头像
+     * @param {number} userId 用户ID
+     * @param {object} row 行数据
+     */
     getAvatar(userId, row) {
       const avatarObj = document.getElementById('avatar-' + userId)
       if (this.avatarMap[userId]) {
@@ -280,6 +294,10 @@ export default {
         })
       }
     },
+
+    /**
+     * 更新用户头像
+     */
     updateAvatar() {
       if (!this.avatarUploadData.raw) {
         return
@@ -291,11 +309,20 @@ export default {
         this.resetUploadData()
       })
     },
+
+    /**
+     * 重置查询条件
+     */
     resetQuery() {
       this.tableData.userName = ''
       this.tableData.minCreateTime = ''
       this.tableData.maxCreateTime = ''
     },
+
+    /**
+     * 编辑用户
+     * @param {object} row 行数据
+     */
     handleEdit(row) {
       this.currentEditRow = row
       for (const key in this.userEditForm) {
@@ -312,12 +339,21 @@ export default {
         this.avatarUploadData.url = row.avatar
       }
     },
+
+    /**
+     * 重置用户编辑表单
+     */
     resetUserEditForm() {
       for (const key in this.userEditForm) {
         this.userEditForm[key] = ''
       }
       this.userEditForm.roleIds = []
     },
+
+    /**
+     * 删除用户
+     * @param {array} userIds 用户ID数组
+     */
     handleDelete(userIds) {
       this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -333,11 +369,20 @@ export default {
         })
       })
     },
+
+    /**
+     * 切换用户状态
+     * @param {object} row 行数据
+     */
     handleSwitch(row) {
       UserApi.changeUserStatus(row.id, row.status).then(() => {
         this.$message.success('操作成功')
       })
     },
+
+    /**
+     * 添加或更新用户
+     */
     addOrUpdateUser() {
       this.$refs.userEditForm.validate(valid => {
         if (valid) {
@@ -363,11 +408,19 @@ export default {
         }
       })
     },
+
+    /**
+     * 创建用户
+     */
     handleCreateUser() {
       this.resetUserEditForm()
       this.resetUploadData()
       this.openUserEditForm()
     },
+
+    /**
+     * 批量删除用户
+     */
     handleBatchDelete() {
       if (this.tableData.selection.length === 0) {
         this.$message.warning('请选择要删除的用户')
@@ -376,25 +429,50 @@ export default {
       const userIds = this.tableData.selection.map(item => item.id)
       this.handleDelete(userIds)
     },
+
+    /**
+     * 处理排序变化
+     * @param {object} column 列对象
+     * @param {string} prop 列属性
+     * @param {string} order 排序方式
+     */
     handleSortChange({ column, prop, order }) {
       this.tableData.orderBy = prop
       this.tableData.orderMethod = order === 'ascending' ? 'asc' : 'desc'
       this.getUserList()
     },
+
+    /**
+     * 处理头像变化
+     * @param {object} file 文件对象
+     */
     handleAvatarChange(file) {
       this.avatarUploadData.raw = file.raw
       this.avatarUploadData.url = URL.createObjectURL(file.raw)
     },
+
+    /**
+     * 重置上传数据
+     * @param {boolean} clear 是否清空数据
+     */
     resetUploadData(clear = true) {
       this.avatarUploadData.raw = null
       this.avatarUploadData.url = clear ? '' : this.avatarMap[this.userEditForm.id] || ''
     },
+
+    /**
+     * 打开用户编辑窗口
+     */
     openUserEditForm() {
       this.userEditDialogVisible = true
       this.$nextTick(() => {
         this.$refs.userEditForm.clearValidate()
       })
     },
+
+    /**
+     * 打开用户导入窗口
+     */
     handleImportUser() {
       this.$refs.userImportDialog.show(true)
     }

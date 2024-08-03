@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 import emptyAvatar from '@/assets/images/empty_avatar.jpg'
+import md5 from 'js-md5'
 
 /**
  * 获取用户自身信息
@@ -24,6 +25,17 @@ export function getAvatar() {
       reject(error)
     })
   })
+}
+
+/**
+ * 更新用户自身头像
+ * @param {File} file
+ */
+export function updateAvatar(file) {
+  const url = 'user-api/users/me/avatar'
+  const formData = new FormData()
+  formData.append('avatar', file)
+  return request.put(url, formData)
 }
 
 /**
@@ -122,6 +134,34 @@ export function checkUserNames(userNames) {
  */
 export function batchCreateUsers(data) {
   return request.post('user-api/users/batch', data)
+}
+
+/**
+ * 修改密码
+ * @param {string} oldPassword
+ * @param {string} newPassword
+ */
+export function changePassword(oldPassword, newPassword) {
+  const params = new URLSearchParams({
+    oldPassword: md5(oldPassword),
+    newPassword: md5(newPassword)
+  })
+  const url = 'user-api/users/me/password'
+  return request.put(url, params)
+}
+
+/**
+ * 修改用户自身信息
+ * @param {Object} data {email, phone, address, gender, introduction}
+ */
+export function updateUserSelfInfo(data) {
+  const url = 'user-api/users/me'
+  // 驼峰改为下划线
+  const newUserObj = {}
+  for (const key in data) {
+    newUserObj[key.replace(/([A-Z])/g, '_$1').toLowerCase()] = data[key]
+  }
+  return request.put(url, newUserObj)
 }
 
 function generateAvatarUrl(response) {

@@ -80,7 +80,7 @@
 
 <script>
 import { getToken } from '@/utils/auth'
-import { getInfo } from '@/api/user'
+import { getInfo, updateUserSelfInfo, updateAvatar } from '@/api/user'
 import PasswordUpdateDialog from '@/components/PasswordUpdateDialog'
 
 export default {
@@ -113,15 +113,14 @@ export default {
     this.getUserInfo()
   },
   methods: {
+
+    /**
+     * 修改用户信息
+     */
     updateUserInformation() {
       this.$refs['userInformationUpdateForm'].validate((valid) => {
         if (valid) {
-          // 转为json字符串，驼峰改为下划线
-          const newUserObj = {}
-          for (const key in this.userUpdateForm) {
-            newUserObj[key.replace(/([A-Z])/g, '_$1').toLowerCase()] = this.userUpdateForm[key]
-          }
-          this.$http.put('user-api/users/me', newUserObj).then(() => {
+          updateUserSelfInfo(this.userUpdateForm).then(() => {
             this.$message.success('修改成功')
             this.getUserInfo()
             this.updateUserInformationDialogVisible = false
@@ -129,22 +128,43 @@ export default {
         }
       })
     },
+
+    /**
+     * 取消修改用户信息
+     */
     cancelUpdateUserInformation() {
       this.updateUserInformationDialogVisible = false
     },
+
+    /**
+     * 打开修改用户信息对话框
+     */
     openUpdateUserInformationDialog() {
       this.updateUserInformationDialogVisible = true
       this.userUpdateForm = JSON.parse(JSON.stringify(this.userInfo))
     },
+
+    /**
+     * 获取头像
+     */
     getAvatar() {
       this.$store.dispatch('user/getAvatar').then((res) => {
         this.avatarUrl = res
       })
     },
+
+    /**
+     * 头像上传成功回调
+     */
     onAvatarUploadSuccess() {
       this.$message.success('上传成功')
       this.getAvatar()
     },
+
+    /**
+     * 头像上传前校验
+     * @param {File} file
+     */
     beforeAvatarUpload(file) {
       const allowType = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
       const typeCheck = allowType.includes(file.type)
@@ -157,16 +177,24 @@ export default {
       }
       return typeCheck && isLt2M
     },
+
+    /**
+     * 获取用户信息
+     */
     getUserInfo() {
       getInfo().then((res) => {
         this.userInfo = res.data.data
       })
     },
+
+    /**
+     * 上传头像
+     * @param {Object} { file }
+     */
     uploadAvatar({ file }) {
-      const formData = new FormData()
-      formData.append('avatar', file)
-      return this.$http.put('user-api/users/me/avatar', formData)
+      return updateAvatar(file)
     }
+
   }
 }
 </script>
