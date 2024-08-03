@@ -52,6 +52,10 @@ export function getUserAvatar(userId) {
  */
 export function getUsers(data) {
   const params = new URLSearchParams(data)
+  // orderBy由驼峰转为下划线
+  if (params.has('orderBy')) {
+    params.set('orderBy', params.get('orderBy').replace(/([A-Z])/g, '_$1').toLowerCase())
+  }
   const url = `user-api/users?${params.toString()}`
   return request.get(url)
 }
@@ -101,6 +105,23 @@ export function addUser(data) {
  */
 export function updateUser(data) {
   return request.put('user-api/users', data)
+}
+
+/**
+ * 批量检查用户名是否存在
+ * @param {list} userNames
+ */
+export function checkUserNames(userNames) {
+  const url = 'user-api/users/user-name/batch-check-existence'
+  return request.post(url, userNames)
+}
+
+/**
+ * 批量创建用户
+ * @param {list} data {userName, trueName, password, email, phone, gender, address, introduction, roleIds}
+ */
+export function batchCreateUsers(data) {
+  return request.post('user-api/users/batch', data)
 }
 
 function generateAvatarUrl(response) {

@@ -37,6 +37,7 @@
     <div>
       <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleCreateUser"> 新增 </el-button>
       <el-button type="danger" plain icon="el-icon-delete" size="mini" @click="handleBatchDelete"> 删除</el-button>
+      <el-button type="info" plain icon="el-icon-upload2" size="mini" @click="handleImportUser"> 导入 </el-button>
     </div>
 
     <!-- 用户列表 -->
@@ -145,6 +146,9 @@
       </span>
     </el-dialog>
 
+    <!-- 用户导入弹窗 -->
+    <user-import-dialog ref="userImportDialog" @import-success="getUserList" />
+
   </div>
 </template>
 
@@ -155,11 +159,15 @@ import { getRoles } from '@/api/role'
 import { checkUserName } from '@/api/auth'
 import emptyAvatar from '@/assets/images/empty_avatar.jpg'
 import LoadingUtils from '@/utils/loading-utils'
+import UserImportDialog from './components/UserImportDialog.vue'
 
 const copyObject = obj => JSON.parse(JSON.stringify(obj))
 
 export default {
   name: 'User',
+  components: {
+    UserImportDialog
+  },
   data() {
     return {
       tableData: {
@@ -241,6 +249,7 @@ export default {
     getAllRoles() {
       getRoles().then(res => {
         this.allRoles = res.data.data
+        this.$refs.userImportDialog.setRoles(this.allRoles)
       })
     },
     getUserList() {
@@ -385,6 +394,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.userEditForm.clearValidate()
       })
+    },
+    handleImportUser() {
+      this.$refs.userImportDialog.show(true)
     }
   }
 }
