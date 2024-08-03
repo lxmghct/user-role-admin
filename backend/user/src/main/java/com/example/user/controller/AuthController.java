@@ -55,7 +55,7 @@ public class AuthController {
     public ResponseVO<Map<String, Object>> login(@RequestParam @ApiParam(value = "用户名", required = true) String userName,
                                                  @RequestParam @ApiParam(value = "密码", required = true) String password,
                                                  @RequestParam @ApiParam(value = "登录系统, " + PlatformEnum.PLATFORM_DESC, required = true) Integer platform) {
-        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName));
+        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName).ne("status", User.Status.DELETED));
         if (user == null) {
             return ResponseVO.error(StatusEnum.USER_NOT_FOUND);
         }
@@ -98,7 +98,7 @@ public class AuthController {
     public ResponseVO<String> register(@RequestParam @ApiParam(required = true, value = "用户名") String userName,
                                        @RequestParam @ApiParam(required = true, value = "密码") String password) {
         // 保存用户
-        Role role = roleService.getOne(new QueryWrapper<Role>().eq("name", RoleEnum.USER.getName()));
+        Role role = roleService.getOne(new QueryWrapper<Role>().eq("name", RoleEnum.USER.getName()).eq("status", Role.Status.ENABLE));
         if (role == null) {
             return ResponseVO.error(CommonStatusEnum.INTERNAL_SERVER_ERROR);
         }
