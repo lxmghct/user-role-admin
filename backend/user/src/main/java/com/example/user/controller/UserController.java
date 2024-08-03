@@ -332,4 +332,16 @@ public class UserController {
         return ResponseVO.success();
     }
 
+    /**
+     * 批量检查用户名是否存在
+     *
+     * @param userNameList 用户名列表
+     */
+    @ApiOperation(value = "批量检查用户名是否存在")
+    @PostMapping("/user-name/batch-check-existence")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    public ResponseVO<Map<String, Boolean>> checkUserNameExists(@RequestBody List<String> userNameList) {
+        return ResponseVO.success(userService.batchCheckUserName(userNameList));
+    }
+
 }

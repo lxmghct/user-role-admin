@@ -140,4 +140,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
     }
 
+    @Override
+    public Map<String, Boolean> batchCheckUserName(List<String> userNames) {
+        if (userNames == null || userNames.size() == 0) {
+            return Collections.emptyMap();
+        }
+        List<User> existUsers = userMapper.selectList(new QueryWrapper<User>().in("user_name", userNames).ne("status", User.Status.DELETED));
+        Set<String> existUserNameSet = existUsers.stream().map(user -> user.getUserName().trim()).collect(Collectors.toSet());
+        Map<String, Boolean> result = new HashMap<>();
+        for (String name : userNames) {
+            result.put(name, existUserNameSet.contains(name));
+        }
+        return result;
+    }
+
 }

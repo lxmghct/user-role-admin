@@ -27,4 +27,6 @@ public interface UserService extends IService<User> {
      */
     boolean existsByUserName(String userName, Boolean throwExceptionWhenExists) throws CustomRuntimeException;
 
+    Map<String, Boolean> batchCheckUserName(List<String> userNames);
+
 }
