@@ -21,13 +21,17 @@
 vue-element-admin只是一种后台的前端解决方案，在界面显示上控制用户的行为，但并不能真正控制用户的权限（比如可以通过命令行直接访问接口）。真正的权限还是需要在后端进行控制（如Spring Security等）。
 
 ## 项目运行
+先前往 [nodejs 官网](https://nodejs.org/zh-cn/download/package-manager/) 下载并安装 nodejs。然后执行以下命令：
+
 ```bash
 # 安装依赖
 npm install
 
 # 启动前端
 npm run dev
+```
 
-# 打包
+## 项目打包
+```bash
 npm run build:prod
 ```
