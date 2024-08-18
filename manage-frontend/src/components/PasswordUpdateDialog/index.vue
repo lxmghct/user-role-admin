@@ -23,9 +23,13 @@
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancelUpdatePassword()">取 消</el-button>
       <el-button
+        :disabled="isSubmitting"
         type="primary"
         @click="updatePassword()"
-      >确 定</el-button>
+      >
+        <i v-if="isSubmitting" class="el-icon-loading" />
+        确 定
+      </el-button>
     </span>
   </el-dialog>
 </template>
@@ -69,6 +73,7 @@ export default {
         newPasswordCheck: '',
         passwordStrength: 0
       },
+      isSubmitting: false,
       passwordUpdateRules: {
         oldPassword: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -90,9 +95,12 @@ export default {
     updatePassword() {
       this.$refs['passwordUpdateForm'].validate((valid) => {
         if (valid) {
+          this.isSubmitting = true
           changePassword(this.passwordUpdateForm.oldPassword, this.passwordUpdateForm.newPassword).then(() => {
             this.$message.success('密码修改成功')
             this.cancelUpdatePassword()
+          }).finally(() => {
+            this.isSubmitting = false
           })
         }
       })
