@@ -11,7 +11,7 @@
 - 后端：Spring Boot、Spring Security、MyBatis、MySQL、Redis等
 
 ## 项目设计
-详细设计文档请参考[用户权限管理系统设计](https://lxmghct.github.io/%E6%8A%80%E6%9C%AF%E6%8E%A2%E7%B4%A2/2024/06/16/%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.html)。
+详细设计文档请参考[用户权限管理系统设计](https://lxmghct.github.io/tech-exploration/2024/06/16/%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1.html)。
 
 ## 项目运行
 分别参考`manage-frontend`和`backend`目录下的README.md文件来运行项目。
